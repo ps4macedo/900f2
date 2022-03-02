@@ -37,8 +37,10 @@ gtavw133.bin
 gtavw138.bin
 historyblocker.bin
 index.html
+int64.js
 int64b.js
 kerneldumper.bin
+kexploit.js
 LinuxLoader1gb.js
 LinuxLoader2gb.js
 LinuxLoader3gb.js
@@ -61,9 +63,11 @@ rdriio124.bin
 relocator.js
 restoredb.bin
 rifrenamer.bin
+rop.js
 ropb2.js
 syscalls.js
 syscalls2.js
 ToDex.bin
 web.html
+webkit.js
 WebRTE.bin
