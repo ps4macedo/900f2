@@ -27,34 +27,42 @@ function allset() {
 window.progress.innerHTML= "Carga útil carregada com SUCESSO!!!"
 }
 
-function LoaderPL() {
-var payload_buffer = chain.syscall(477, 0, 0x300000 , 7, 0x1002, -1, 0);
-var pl = p.array_from_address(payload_buffer, PLS.byteLength*4);
-var buf = new Uint32Array(PLS);
-pl.set(buf,0);
-var pthread = p.malloc(0x10);
-chain.call(libKernelBase.add32(OFFSET_lk_pthread_create), pthread, 0x0, payload_buffer, 0);
-allset();
-}	
-
-function load_poc(){
+function loadBIN(){
 var xhr = new XMLHttpRequest();
-xhr.responseType = "arraybuffer";
-xhr.open("GET",PLfile,true);
-xhr.send();
-xhr.onreadystatechange=function(){
-if (xhr.readyState == 4){
-PLS = xhr.response;
-LoaderPL(); 
+xhr.open('GET', PLfile, true);
+xhr.overrideMimeType('text/plain; charset=x-user-defined');
+xhr.onload = function(e) {
+if (this.status == 200) {
+payload = this.response;
+SendPayload();
+allset();
 }
-};
-}	
+else
+{
+alert("Failed to load " + PLfile + " - " + this.status);
+return;
+}};
+xhr.send();
+}
 
+function SendPayload() {
+var payload_buffer = chain.syscall(477, new int64(0x26200000, 0x9), 0x300000, 7, 0x41000, -1, 0);
+var bufLen = payload.length;
+var payload_loader = p.malloc32(bufLen);
+var loader_writer = payload_loader.backing;
+for(var i=0;i<bufLen/4;i++){
+var hxVal = payload.slice(i*4,4+(i*4)).split("").reverse().join("").split("").map(function(s){return("0000" + s.charCodeAt(0).toString(16)).slice(-2);}).join("");
+loader_writer[i] = parseInt(hxVal, 16);
+}
+chain.syscall(74, payload_loader, bufLen, (0x1 | 0x2 | 0x4));
+var pthread = p.malloc(0x10);
+chain.call(libKernelBase.add32(OFFSET_lk_pthread_create), pthread, 0x0, payload_loader, payload_buffer);
+}
+	
 function goldhen2(){
 progress.innerHTML="Goldhen 2.0b2 loading... please wait";
 LoadedMSG="GoldHEN 2.0b2 Loaded";
 PLfile = "goldhen2b2.bin";
-load_poc();
 }
 
 function Binset() {
@@ -114,7 +122,6 @@ progress.innerHTML="Goldhen loading... please wait";
 LoadedMSG="GoldHEN 2.0b Loaded";
 PLfile = "goldhen2b.bin";
 out_jb = "AllPL";
-load_poc();
 }
 
 function goldhen2(){
@@ -122,7 +129,6 @@ progress.innerHTML="Goldhen 2.0b2 loading... please wait";
 LoadedMSG="GoldHEN 2.0b2 Loaded";
 PLfile = "goldhen2b2.bin";
 out_jb = "AllPL";
-load_poc();
 }
 
 function goldhen21(){
@@ -130,149 +136,147 @@ progress.innerHTML="Goldhen 2.1 loading... please wait";
 LoadedMSG="GoldHEN 2.1 Loaded";
 PLfile = "goldhen_2.1_900.bin";
 out_jb = "AllPL";
-load_poc();
 }
 
 function load_PS4Debug(){
 progress.innerHTML="PS4Debug loading... please wait"; LoadedMSG="PS4Debug Loaded";
 PLfile = "ps4debug.bin";
 out_jb = "AllPL";
-load_poc();
 }
 
 function load_permanentuart(){
 progress.innerHTML="permanentuart loading... please wait"; LoadedMSG="permanentuart Loaded";
 PLfile = "permanentuart.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_App2USB(){
 progress.innerHTML="app2usb loading... please wait"; LoadedMSG="app2usb Loaded";
 PLfile = "app2usb.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_BackupDB(){
 progress.innerHTML="backupdb loading... please wait"; LoadedMSG="backupdb Loaded";
 PLfile = "backupdb.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_AppDumper(){
 progress.innerHTML="AppDumper loading... please wait"; LoadedMSG="AppDumper Loaded";
 PLfile = "app-dumper.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_KernelDumper(){
 progress.innerHTML="kerneldumper loading... please wait"; LoadedMSG="kerneldumper Loaded";
 PLfile = "kerneldumper.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_ModuleDumper(){
 progress.innerHTML="ModuleDumper loading... please wait"; LoadedMSG="ModuleDumper Loaded";
 PLfile = "mdumper.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_RestoreDB(){
 progress.innerHTML="RestoreDB loading... please wait"; LoadedMSG="RestoreDB Loaded";
 PLfile = "restoredb.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_DisableASLR(){
 progress.innerHTML="DisableASLR loading... please wait"; LoadedMSG="DisableASLR Loaded";
 PLfile = "disableaslr.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_DisableUpdates(){
 progress.innerHTML="DisableUpdates loading... please wait"; LoadedMSG="DisableUpdates Loaded";
 PLfile = "disableupdates.bin";
 out_jb = "AllPL";
-load_poc();
+
 }
 
 function load_EnableUpdates(){
 progress.innerHTML="EnableUpdates loading... please wait"; LoadedMSG="EnableUpdates Loaded";
 PLfile = "enableupdates.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_EnableBrowser(){
 progress.innerHTML="EnableBrowser loading... please wait"; LoadedMSG="EnableBrowser Loaded";
 PLfile = "enablebrowser.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_ExitIDU(){
 progress.innerHTML="ExitIDU loading... please wait"; LoadedMSG="ExitIDU Loaded";
 PLfile = "exitidu.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_FTP(){
 progress.innerHTML="FTP loading... please wait"; LoadedMSG="FTP Loaded";
 PLfile = "ftp.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_HistoryBlocker(){
 progress.innerHTML="HistoryBlocker loading... please wait"; LoadedMSG="HistoryBlocker Loaded";
 PLfile = "historyblocker.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_RIFRenamer(){
 progress.innerHTML="RIFRenamer loading... please wait"; LoadedMSG="RIFRenamer Loaded";
 PLfile = "rifrenamer.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_Orbis(){
 progress.innerHTML="Orbis-Toolbox loading... please wait"; LoadedMSG="Orbis-Toolbox Loaded";
 PLfile = "Orbis-Toolbox-900.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_GTAV(){
 progress.innerHTML="Payload loading... please wait"; LoadedMSG="Payload Loaded";
 PLfile = modsGTAV.value+".bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_RDRII(){
 progress.innerHTML="Payload loading... please wait"; LoadedMSG="Payload Loaded";
 PLfile = modsRDRII.value+".bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_ToDex(){
 progress.innerHTML="Payload loading... please wait"; LoadedMSG="Payload Loaded";
 PLfile = "ToDex.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_WebRTE(){
 progress.innerHTML="Payload loading... please wait"; LoadedMSG="Payload Loaded";
 PLfile = "WebRTE.bin";
-out_jb = "AllPL";     load_poc();
+out_jb = "AllPL";     
 }
 
 function load_fan(){
 progress.innerHTML="Payload loading... please wait"; LoadedMSG="Payload Loaded";
 PLfile = "fan"+tempC.value+".bin";
 out_jb = "AllPL";
-load_poc();
+
 }
 
 function Mloader(){
 progress.innerHTML="Payload loading... please wait"; LoadedMSG="Payload Loaded";
 PLfile = "MiraLoader.bin";
 out_jb = "MLD";
-load_poc();
+
 }
 
 function Bloader(){
@@ -295,7 +299,7 @@ gtav.style.display = "none";
 
 <body onload="Esconder()">
 <br><br>
-<h1><center><font style='color:#fff; font-size: 42px; font-weight: bold; margin: 0 0 0 0.0; text-shadow: 3px 2px #ff5757;'><i>PS4MACEDO FW v9.00 FULL v2</i></font></center></h1>
+<h1><center><font style='color:#fff; font-size: 42px; font-weight: bold; margin: 0 0 0 0.0; text-shadow: 3px 2px #ff5757;'><i>PS4MACEDO FW v9.00 Full v2</i></font></center></h1>
 <hr width="70%" size="1" color="#ff5757">
 <div id=progress style=font-size:31px;text-align:center;color:#fff>Preparando o desbloqueio. Por favor, <font color="#ee596f">GUARDE!!!</font></div>
 <hr width="70%" size="1" color="#ff5757">
