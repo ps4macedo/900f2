@@ -16,7 +16,7 @@ window.applicationCache.ondownloading=function(){localStorage.isCached=!1},windo
 <script>  // verifica se a cache foi carregada
 function Esconder(){
 if (localStorage.isCached){
-poc();
+setTimeout(poc,500);
 }
 }
 </script>
@@ -24,7 +24,7 @@ poc();
 <script> // loader
 function jbdone() {
 progress.innerHTML="Desbloqueio efetuado com SUCESSO!!!"
-setTimeout(function(){progress.innerHTML="LISTA DE CARGAS ÚTEIS"},3e3)
+setTimeout(function(){progress.innerHTML="LISTA DE CARGAS ÚTEIS"},1e3)
 mymenu.style.display="block";
 }
 
